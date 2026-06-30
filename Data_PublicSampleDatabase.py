@@ -7,17 +7,20 @@ Public single-file sample database utilities.
 逻辑说明 / Logic
 English: Logic.
 ----------------
-1. 公开版数据库以一个样本一个 `.npz` 文件保存，不再暴露原始样本文件夹名或真实采集路径。
-English: 1. public releasesample `.npz` filesave, sample filepath.
-2. 每个样本文件只包含匿名样本名、多源输入数据和标签；原始样本名到匿名名的映射不写入公开数据库。
-English: 2. sample filesample, Inputlabel; samplewritepublic database.
-3. 训练期 Dataset 可直接读取该格式，避免继续依赖原始批次文件夹、同级 blank 文件夹和 `.mat` 真值表。
-English: 3. training Dataset read, avoidfile, blank file `.mat` ground truth.
+1. 公开版数据库以一个样本一个 `.npz` 文件保存，根目录包含清单文件和 `samples/` 子目录。
+English: 1. The public database stores one `.npz` file per sample; the root contains a manifest and the `samples/` directory.
+2. 每个样本文件包含 `sample_id`、多源输入数据、`labels` 和 `target_names`，可直接组成训练 Dataset 条目。
+English: 2. Each sample file contains `sample_id`, multisource inputs, `labels`, and `target_names`, and can be converted directly into a training Dataset item.
+3. 训练期使用 `sample_id` 作为稳定折分 ID、输出对齐 ID 和样本索引 ID。
+English: 3. During training, `sample_id` is used as the stable split ID, output-alignment ID, and sample index ID.
 
-最近修改时间 / Last modified: 2026-06-16
-English: Last modified: 2026-06-16.
-作者 / Author: ljy
-English: Author: ljy.
+最近修改时间 / Last modified: 2026-06-30
+English: Last modified: 2026-06-30.
+作者 / Author: ljy / GG
+English: Author: ljy / GG.
+维护记录 / Maintenance:
+- 2026-06-30；作者：GG。说明文字改为当前公开数据库字段和训练期索引语义。
+English: - 2026-06-30; Author: GG. Documentation now describes the current public database fields and training-time index semantics.
 """
 
 from __future__ import annotations

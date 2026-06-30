@@ -96,8 +96,8 @@ MENU_REGISTRY: dict[str, MenuEntry] = {
 @dataclass(frozen=True)
 class ConfigOverrideSpec:
     """
-    终端参数到 legacy Config 字段的映射。
-    English: parameter legacy Config field.
+    终端参数到训练 Config 字段的映射。
+    English: Mapping from terminal parameters to training Config fields.
 
     说明：
     English: :
@@ -106,10 +106,13 @@ class ConfigOverrideSpec:
     - 若某个菜单对应的 Config 没有目标字段，则该参数会被跳过并在摘要中提示。
     English: - menu Config field, parameter.
 
-    最近修改时间 / Last modified: 2026-05-24
-    English: Last modified: 2026-05-24.
-    作者 / Author: ljy
-    English: Author: ljy.
+    最近修改时间 / Last modified: 2026-06-30
+    English: Last modified: 2026-06-30.
+    作者 / Author: ljy / GG
+    English: Author: ljy / GG.
+    维护记录 / Maintenance:
+    - 2026-06-30；作者：GG。清理终端帮助中的历史兼容表述，保持用户侧说明面向当前公开数据库。
+    English: - 2026-06-30; Author: GG. Clean historical compatibility wording in terminal help and keep user-facing text focused on the current public database.
     """
 
     cli_name: str
@@ -130,8 +133,8 @@ OVERRIDE_SPECS: tuple[ConfigOverrideSpec, ...] = (
     ConfigOverrideSpec("resume_save_dir", "RESUME_SAVE_DIR", "path", "断点续训目录；空值使用训练代码默认。", "断点续训目录"),
     ConfigOverrideSpec("dataset_root", "DATASET_ROOT", "path", "公开版匿名单文件数据库根目录；会派生 DATA_DIR=samples。", "数据库根目录"),
     ConfigOverrideSpec("data_dir", "DATA_DIR", "path", "公开版样本 .npz 目录。", "样本文件目录", prompt_group="advanced"),
-    ConfigOverrideSpec("gt_path", "GT_PATH", "path", "兼容旧库的 SOC 真值路径；公开版通常留空。", "SOC 真值路径", prompt_group="advanced"),
-    ConfigOverrideSpec("tn_path", "TN_PATH", "path", "兼容旧库的 TN 真值路径；公开版通常留空。", "TN 真值路径", prompt_group="advanced"),
+    ConfigOverrideSpec("gt_path", "GT_PATH", "path", "可选 SOC 标签文件路径；当前公开库标签来自 .npz，通常留空。", "SOC 标签文件路径", prompt_group="advanced"),
+    ConfigOverrideSpec("tn_path", "TN_PATH", "path", "可选 TN 标签文件路径；当前公开库标签来自 .npz，通常留空。", "TN 标签文件路径", prompt_group="advanced"),
     ConfigOverrideSpec("pca_priors_path", "PCA_PRIORS_PATH", "path", "PCA 先验路径；仅在对应菜单支持时生效。", "PCA 先验路径", prompt_group="advanced"),
     ConfigOverrideSpec("full_reference_run_dir", "FULL_REFERENCE_RUN_DIR", "path", "输入端消融 Full 只读参考结果目录。", "Full 参考结果目录", prompt_group="advanced", menu_keys=("input_ablation",)),
     ConfigOverrideSpec("shared_folds_csv_path", "SHARED_FOLDS_CSV_PATH", "path", "外部 shared_folds/fold_assignments.csv 路径。", "shared_folds CSV 路径", prompt_group="advanced"),
@@ -163,9 +166,9 @@ OVERRIDE_SPECS: tuple[ConfigOverrideSpec, ...] = (
     ConfigOverrideSpec("train_loss_patience_max_multiplier", "TRAIN_LOSS_PATIENCE_MAX_MULTIPLIER", "float", "训练损失临时 patience 上限倍率。", "训练损失 patience 上限倍率", prompt_group="advanced"),
     ConfigOverrideSpec("lr_patience_grad_accum_extra_multiplier", "LR_PATIENCE_GRAD_ACCUM_EXTRA_MULTIPLIER", "float", "低 batch 梯度累积 patience 额外倍率。", "梯度累积 patience 额外倍率", prompt_group="advanced"),
     ConfigOverrideSpec("min_effective_update_batch_size", "MIN_EFFECTIVE_UPDATE_BATCH_SIZE", "int", "梯度累积目标有效 batch 下限。", "有效 batch 下限", prompt_group="advanced"),
-    ConfigOverrideSpec("lr_patience_small_batch_threshold", "LR_PATIENCE_SMALL_BATCH_THRESHOLD", "int", "旧小 batch patience 阈值兼容字段。", "旧小 batch patience 阈值", prompt_group="advanced"),
-    ConfigOverrideSpec("lr_patience_small_batch_multiplier", "LR_PATIENCE_SMALL_BATCH_MULTIPLIER", "float", "旧小 batch patience 倍率兼容字段。", "旧小 batch patience 倍率", prompt_group="advanced"),
-    ConfigOverrideSpec("lr_patience_batch_one_multiplier", "LR_PATIENCE_BATCH_ONE_MULTIPLIER", "float", "旧 batch=1 patience 倍率兼容字段。", "旧 batch=1 patience 倍率", prompt_group="advanced"),
+    ConfigOverrideSpec("lr_patience_small_batch_threshold", "LR_PATIENCE_SMALL_BATCH_THRESHOLD", "int", "小 batch patience 阈值保留字段。", "小 batch patience 阈值", prompt_group="advanced"),
+    ConfigOverrideSpec("lr_patience_small_batch_multiplier", "LR_PATIENCE_SMALL_BATCH_MULTIPLIER", "float", "小 batch patience 倍率保留字段。", "小 batch patience 倍率", prompt_group="advanced"),
+    ConfigOverrideSpec("lr_patience_batch_one_multiplier", "LR_PATIENCE_BATCH_ONE_MULTIPLIER", "float", "batch=1 patience 倍率保留字段。", "batch=1 patience 倍率", prompt_group="advanced"),
     ConfigOverrideSpec("freeze_batchnorm_when_batch_lt_min_effective", "FREEZE_BATCHNORM_WHEN_BATCH_LT_MIN_EFFECTIVE", "bool", "小 batch 时是否冻结 BatchNorm running statistics。", "小 batch 冻结 BN", prompt_group="advanced"),
     ConfigOverrideSpec("export_decimals", "EXPORT_DECIMALS", "int", "CSV/汇总导出小数位数。", "导出小数位数", prompt_group="advanced"),
     ConfigOverrideSpec("export_onnx_after_training", "EXPORT_ONNX_AFTER_TRAINING", "bool", "训练完成后是否自动导出每模型代表 ONNX。", "训练后导出 ONNX", prompt_group="advanced"),
@@ -254,10 +257,13 @@ def normalize_path_text(value: Any) -> Optional[str]:
     English: :
     - 空值返回 None，表示不覆盖；
     English: - empty valuereturn None, ;
-    - 相对路径按当前 `Python script V2` 目录解释；
-    English: - pathcurrent `Python script V2` directory;
+    - 相对路径按当前 `Training Code` 目录解释；
+    English: - relative paths are resolved from the current `Training Code` directory;
     - 不要求路径当前存在，便于新输出目录或未来缓存目录配置。
-    English: - pathcurrent, Outputdirectorycachedirectoryconfiguration.
+    English: - paths do not need to exist yet, which helps configure new output or cache directories.
+
+    最近修改时间：2026-06-30；作者：GG。路径说明改为当前工程目录表述。
+    English: Last modified: 2026-06-30; Author: GG. Path notes now refer to the current project directory.
     """
 
     value = normalize_blank(value)
@@ -445,7 +451,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         default=[],
         metavar="ATTR=VALUE",
-        help="高级覆盖：直接设置 legacy Config 字段；空 VALUE 表示跳过。",
+        help="高级覆盖：直接设置训练 Config 字段；空 VALUE 表示跳过。",
     )
 
     for spec in OVERRIDE_SPECS:
@@ -781,7 +787,7 @@ def apply_dependent_defaults(menu: Any, changed_attrs: set[str], force_derived_a
         English: Design note:
             这里严格遵守“终端/用户显式值优先”，不会覆盖 changed_attrs 中已有的用户设置。
             English: “/explicit”, changed_attrs .
-            当命令行/交互层改了上级路径而 Train_main 面板保留旧派生路径时，可通过 force_derived_attrs 定向刷新。
+            当命令行/交互层改了上级路径而 Train_main 面板保留已有派生路径时，可通过 force_derived_attrs 定向刷新。
             English: /path Train_main path, force_derived_attrs .
             最近修改时间：2026-06-16；作者：GG。
             English: Last modified: 2026-06-16; Author: GG.
@@ -824,7 +830,7 @@ def refresh_specs_using_terminal_defaults(menu: Any, changed_attrs: set[str], pr
     English: current `PCA_PRIORS_PATH -> ModelSpec.priors_path`:
     - 若某个 spec 的 priors_path 等于终端覆盖前的 Config.PCA_PRIORS_PATH，说明它只是引用了默认先验路径，可随终端默认值一起更新；
     English: - spec priors_path Config.PCA_PRIORS_PATH, defaultpath, defaultupdate;
-    - 若 spec.priors_path 与旧默认不同，视为菜单特化设定，保持不变。
+    - 若 spec.priors_path 与先前默认不同，视为菜单特化设定，保持不变。
     English: - spec.priors_path default, menu, .
     """
 
@@ -976,8 +982,8 @@ def prepare_run(argv: Optional[Sequence[str]] = None, design_defaults: Optional[
 
     # 最后同步菜单清单。该顺序体现“菜单特化设定 > 终端设定 > 训练代码默认”：
     # EN: most after same single single. this order order " > > ":
-    # 终端先改 Config 默认值，菜单再把模型规格清单覆盖回 legacy 主体。
-    # EN: terminal first change Config default value, single then model specification single override legacy.
+    # 终端先改 Config 默认值，菜单再把模型规格清单同步回训练主体。
+    # EN: terminal settings first update Config defaults, then the menu syncs model specs back to the training engine.
     menu.sync_to_engine()
 
     dry_run = pick_bool_setting(args.dry_run, design_defaults, "dry_run", False)
