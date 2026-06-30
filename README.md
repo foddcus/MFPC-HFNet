@@ -658,6 +658,29 @@ python Train_main.py --dry-run
 
 ## 15. 发布和使用边界 / Release and Usage Boundary
 
+### 15.1 数据获取与体积 / Data Access and Size
+
+当前随包公开数据库 `PublicSoilSampleDatabase` 的本地实测体积如下：
+English: The measured local size of the packaged public database `PublicSoilSampleDatabase` is:
+
+```text
+146,718,730,708 bytes
+约 136.64 GiB
+约 146.72 GB
+```
+
+如需索要原数据或完整数据获取方式，请向以下邮箱申请：
+English: To request the original data or access instructions for the complete data, please contact:
+
+```text
+foddcus@gamail
+```
+
+申请时建议说明数据用途、使用单位、联系人和预期使用范围。
+English: When requesting data, it is recommended to include the intended use, organization, contact person, and expected usage scope.
+
+### 15.2 公开包建议内容 / Recommended Public Package Contents
+
 面向使用者的公开包建议包含：
 English: The user-facing public package should include:
 
@@ -701,5 +724,7 @@ English: The user-facing public package should not include:
 
 ## 17. 关键维护记录 / Key Maintenance Log
 
+- 2026-06-30：GG 新增数据索要邮箱和当前公开数据库体积说明。
+  English: 2026-06-30: GG added the data request email and the current public database size note.
 - 2026-06-30：GG 补正文档细节和中英文对照，保留当前公开数据库结构、训练入口、运行命令、输出解读和维护边界。
   English: 2026-06-30: GG restored detailed documentation and bilingual notes while keeping the focus on the current public database structure, training entry, run commands, output interpretation, and maintenance boundary.
