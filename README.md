@@ -1,4 +1,4 @@
-# Python script V2 公开版训练工程新手说明书 / Python script V2 public-release training projectbeginnernote.
+# MFPCHF-Net 工程说明书 / MFPC-HFNet training projectbeginnernote.
 
 更新时间：2026-06-18  
 English: last updated: 2026-06-18.
