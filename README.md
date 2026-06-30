@@ -673,7 +673,7 @@ English: The measured local size of the packaged public database `PublicSoilSamp
 English: To request the original data or access instructions for the complete data, please contact:
 
 ```text
-foddcus@gamail
+foddcus@gmail
 ```
 
 申请时建议说明数据用途、使用单位、联系人和预期使用范围。
