@@ -36,7 +36,7 @@ English: Read and execute the steps in this order:
 English: If you only want to confirm that the training entry can read the current configuration, use:
 
 ```powershell
-Set-Location "C:\Users\94562\Desktop\Multisource Data LJY 2025\Training Code"
+Set-Location "C:\path\to\MFPC-HFNet"
 python Train_main.py --dry-run
 ```
 
@@ -55,9 +55,9 @@ English: The current default training task is:
 训练菜单 / Menu: mfpchfnetv2
 训练模型 / Model: MFPCHFNetV2_Full
 目标变量 / Target: SOC
-数据库 / Database: PublicSoilSampleDatabase beside Training Code
+数据库 / Database: PublicSoilSampleDatabase beside the repository
 交叉验证 / Cross-validation: 8 folds, 8 runs
-输出目录 / Output directory: Training Code/ModelData
+输出目录 / Output directory: MFPC-HFNet/ModelData
 训练后导出 / Export after training: ONNX
 ```
 
@@ -73,12 +73,12 @@ English: Beginners can understand the whole project as four jobs:
 
 ## 2. 推荐目录结构 / Recommended Directory Structure
 
-默认代码假定 `Training Code` 和 `PublicSoilSampleDatabase` 是并列目录。
-English: The default code assumes that `Training Code` and `PublicSoilSampleDatabase` are sibling directories.
+默认代码假定仓库目录和 `PublicSoilSampleDatabase` 是并列目录；数据库不在本 GitHub 仓库中。
+English: The default code assumes that this repository and `PublicSoilSampleDatabase` are sibling directories; the database is not tracked in this GitHub repository.
 
 ```text
-Multisource Data LJY 2025/
-  Training Code/
+workspace/
+  MFPC-HFNet/
     README.md
     Train_main.py
     Train_config.py
@@ -96,11 +96,9 @@ Multisource Data LJY 2025/
     Model_CompareBackbones.py
     Model_EfficientNet1024Backbones.py
     Metrics_core.py
-    ModelAssets/
-      pca_priors_full.pt
-    Tool/
-      Tool_CheckTrainingPolicy.py
-  PublicSoilSampleDatabase/
+    pca_priors_full.pt
+    Tool_CheckTrainingPolicy.py
+  PublicSoilSampleDatabase/  # separately supplied; not in this repository
     README.md
     public_dataset_manifest.json
     samples/
@@ -108,12 +106,12 @@ Multisource Data LJY 2025/
       ...
 ```
 
-本机当前路径示例：
-English: Example local paths on this machine:
+路径示例：
+English: Example local paths:
 
 ```text
-C:\Users\94562\Desktop\Multisource Data LJY 2025\Training Code
-C:\Users\94562\Desktop\Multisource Data LJY 2025\PublicSoilSampleDatabase
+C:\path\to\MFPC-HFNet
+C:\path\to\PublicSoilSampleDatabase
 ```
 
 注意事项如下：
@@ -121,7 +119,7 @@ English: Important notes:
 
 | 项目<br>EN: Item | 说明<br>EN: Description |
 | --- | --- |
-| 路径空格<br>EN: Space in path | `Training Code` 路径中有空格，PowerShell 命令里必须加英文双引号。<br>EN: The path `Training Code` contains a space, so PowerShell commands must use double quotes. |
+| 路径空格<br>EN: Space in path | 路径中可能有空格，PowerShell 命令里应加英文双引号。<br>EN: Quote PowerShell paths that contain spaces. |
 | 默认数据库<br>EN: Default database | 训练入口会自动寻找 `..\PublicSoilSampleDatabase`。<br>EN: The training entry automatically looks for `..\PublicSoilSampleDatabase`. |
 | 临时换库<br>EN: Temporary database override | 数据库在其他位置时，优先用 `--dataset-root` 临时覆盖。<br>EN: If the database is stored elsewhere, prefer a temporary `--dataset-root` override. |
 | 输出目录<br>EN: Output directory | `ModelData/` 用于保存模型、日志、预测表和汇总表，训练后可能很大。<br>EN: `ModelData/` stores models, logs, prediction tables, and summaries, and can become large after training. |
@@ -189,7 +187,18 @@ English: The source code is layered into entry, configuration, menus, training e
 | 训练菜单<br>EN: Training menus | `Menu_*.py` | 声明模型清单、输入尺寸、batch size 和模型级策略。<br>EN: Declares model lists, input sizes, batch sizes, and model-level policies. |
 | 指标输出<br>EN: Metrics output | `Metrics_core.py` | 保存指标、预测表、散点图和最终汇总。<br>EN: Saves metrics, prediction tables, scatter plots, and final summaries. |
 | ONNX 导出<br>EN: ONNX export | `Train_export_onnx.py` | 训练后选择代表 Fold，导出 ONNX 和追溯 JSON。<br>EN: Selects a representative fold after training and exports ONNX plus trace JSON. |
-| 工程检查<br>EN: Engineering check | `Tool/Tool_CheckTrainingPolicy.py` | 检查训练工程边界。<br>EN: Checks training-project boundaries. |
+| 工程检查<br>EN: Engineering check | `Tool_CheckTrainingPolicy.py` | 检查训练工程边界。<br>EN: Checks training-project boundaries. |
+
+### MFPC-HFNet 图像分支 / MFPC-HFNet Image Branch
+
+`Model_MFPCHFNet.py` 对图像构建 high1/high2/high3/low 拉普拉斯频层，使用固定归一化与 PCA 先验。各频层的 PCASE 将保留的主成分分别压缩到 source map，并按特征值分配通道；有效 PCA 秩采用 `K_eff = (sum(lambda))^2 / sum(lambda^2)`。高频容量按 `K_eff × S_l² × r_l` 推导，low 不做结构向量筛选，并采用 `K_eff × S_l` 的通道增长方式。
+English: `Model_MFPCHFNet.py` builds high1/high2/high3/low Laplacian bands with fixed normalization and PCA priors. PCASE compresses retained components into source maps with eigenvalue-weighted channels. The effective PCA rank is `K_eff = (sum(lambda))^2 / sum(lambda^2)`. High-frequency capacity uses `K_eff × S_l² × r_l`; low is not structurally screened and uses `K_eff × S_l` channel scaling.
+
+默认将各 source map 切为 8×8 局部块，同一频层的局部块共用一个 LD Encoder 实例；不同频层分别实例化编码器。token 宽度由 `max(96, ceil_to_multiple(8×8×M_l / token_compression_ratio, 16))` 推导，默认 `token_compression_ratio=8`。高频 token 自 high1 向 high3 逐级 child-to-parent 融合，再与作为单个 token 的 low 层融合；图像表征最终与其他输入分支融合。
+English: Each source map is split into 8×8 patches by default. Patches within a band share one LD Encoder instance, while bands use separate instances. Token width is derived as `max(96, ceil_to_multiple(8×8×M_l / token_compression_ratio, 16))`, with `token_compression_ratio=8` by default. High-frequency tokens fuse from high1 toward high3 via child-to-parent alignment, then fuse with the single low token before multimodal fusion.
+
+仓库根目录包含 `pca_priors_full.pt`，但 `Train_main.py` 的全局 `PCA_PRIORS_PATH` 默认值仍指向 `ModelAssets/pca_priors_full.pt`。MFPC-HFNet 的每个 Fold 训练会从 Train 子集生成并使用 `pca_priors_train_only.pt`；需要读取全局先验时，运行命令添加 `--pca-priors-path .\pca_priors_full.pt`。
+English: The repository contains `pca_priors_full.pt` at its root, while the global `PCA_PRIORS_PATH` default in `Train_main.py` still points to `ModelAssets/pca_priors_full.pt`. Each MFPC-HFNet training fold builds and uses `pca_priors_train_only.pt` from its Train subset. Add `--pca-priors-path .\pca_priors_full.pt` when a global prior is required.
 
 参数优先级固定为：
 English: Parameter priority is fixed as:
@@ -209,11 +218,11 @@ English: Python 3.12 is recommended. Full training expects a CUDA GPU by default
 
 ### 5.1 创建虚拟环境 / Create a Virtual Environment
 
-进入 `Training Code` 后创建虚拟环境：
-English: Enter `Training Code` and create the virtual environment:
+进入仓库目录后创建虚拟环境：
+English: Enter the repository directory and create the virtual environment:
 
 ```powershell
-Set-Location "C:\Users\94562\Desktop\Multisource Data LJY 2025\Training Code"
+Set-Location "C:\path\to\MFPC-HFNet"
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
@@ -282,11 +291,11 @@ English: If `cuda = False`, do not start full training yet. Common causes are a 
 
 ### 6.1 默认数据库位置 / Default Database Location
 
-公开数据库格式为 `public_single_npz_v1`，默认数据库根目录为 `Training Code` 上一级的 `PublicSoilSampleDatabase`。
-English: The public database format is `public_single_npz_v1`, and the default database root is `PublicSoilSampleDatabase` beside `Training Code`.
+公开数据库格式为 `public_single_npz_v1`，默认数据库根目录为仓库目录上一级的 `PublicSoilSampleDatabase`。
+English: The public database format is `public_single_npz_v1`, and the default database root is `PublicSoilSampleDatabase` beside the repository.
 
-在 `Training Code` 目录执行：
-English: Run in the `Training Code` directory:
+在仓库目录执行：
+English: Run in the repository directory:
 
 ```powershell
 Test-Path "..\PublicSoilSampleDatabase\public_dataset_manifest.json"
@@ -294,8 +303,8 @@ Test-Path "..\PublicSoilSampleDatabase\samples"
 (Get-ChildItem "..\PublicSoilSampleDatabase\samples" -Filter *.npz).Count
 ```
 
-期望样本数量：
-English: Expected sample count:
+原数据集记录的样本数量（实际以提供的数据库为准）：
+English: Previously recorded sample count (verify against the supplied database):
 
 ```text
 4372
@@ -443,7 +452,7 @@ python Train_main.py --base-run-dir "D:\MFPC-HFNet-Runs"
 English: Training outputs are written by default to:
 
 ```text
-Training Code/ModelData/
+MFPC-HFNet/ModelData/
 ```
 
 典型结构如下：
@@ -488,7 +497,7 @@ English: Common output files:
 English: If training is interrupted, continue the same experiment directory:
 
 ```powershell
-python Train_main.py --resume-training true --resume-save-dir "C:\Users\94562\Desktop\Multisource Data LJY 2025\Training Code\ModelData\2026-xx-xx_xx-xx-xx_mfpchfnetv2_SOC_8FoldCV"
+python Train_main.py --resume-training true --resume-save-dir "C:\path\to\MFPC-HFNet\ModelData\2026-xx-xx_xx-xx-xx_mfpchfnetv2_SOC_8FoldCV"
 ```
 
 注意事项：
@@ -615,7 +624,7 @@ English: Do not directly hard-code memory strategy changes in `Train_core.py`. P
 English: Paths must be wrapped in English double quotes:
 
 ```powershell
-Set-Location "C:\Users\94562\Desktop\Multisource Data LJY 2025\Training Code"
+Set-Location "C:\path\to\MFPC-HFNet"
 ```
 
 如果终端中文显示异常，可先设置 UTF-8 输出：
@@ -632,14 +641,14 @@ $OutputEncoding = [System.Text.UTF8Encoding]::new()
 English: Syntax check:
 
 ```powershell
-python -B -m py_compile Train_main.py Train_config.py Train_core.py Train_export_onnx.py Train_optimizer.py Train_support.py Metrics_core.py Menu_MFPCHFNetV2.py Menu_InputAblation.py Menu_Compare_AllBackbones.py Tool\Tool_CheckTrainingPolicy.py Model_MFPCHFNet.py Model_CompareBackbones.py Model_EfficientNet1024Backbones.py Data_LoaderRuntimeAuto.py Data_DiskCacheRegistry.py Data_BuildPcaPriorsFull.py Data_PublicSampleDatabase.py
+python -B -m py_compile Train_main.py Train_config.py Train_core.py Train_export_onnx.py Train_optimizer.py Train_support.py Metrics_core.py Menu_MFPCHFNetV2.py Menu_InputAblation.py Menu_Compare_AllBackbones.py Tool_CheckTrainingPolicy.py Model_MFPCHFNet.py Model_CompareBackbones.py Model_EfficientNet1024Backbones.py Data_LoaderRuntimeAuto.py Data_DiskCacheRegistry.py Data_BuildPcaPriorsFull.py Data_PublicSampleDatabase.py
 ```
 
 工程边界检查：
 English: Engineering-boundary check:
 
 ```powershell
-python Tool\Tool_CheckTrainingPolicy.py
+python Tool_CheckTrainingPolicy.py
 ```
 
 期望输出：
@@ -660,8 +669,8 @@ python Train_main.py --dry-run
 
 ### 15.1 数据获取与体积 / Data Access and Size
 
-当前随包公开数据库 `PublicSoilSampleDatabase` 的本地实测体积如下：
-English: The measured local size of the packaged public database `PublicSoilSampleDatabase` is:
+单独提供的 `PublicSoilSampleDatabase` 曾记录的本地体积如下（数据库不在本仓库中）：
+English: A previously recorded local size of the separately supplied `PublicSoilSampleDatabase` is (the database is not in this repository):
 
 ```text
 146,718,730,708 bytes
@@ -689,7 +698,7 @@ English: The user-facing public package should include:
 | 源码 `.py`<br>EN: Source `.py` files | 当前训练工程源码。<br>EN: Current training-project source code. |
 | `README.md` | 当前使用说明。<br>EN: Current usage guide. |
 | `.gitignore` | 本地输出排除规则。<br>EN: Local-output exclusion rules. |
-| `ModelAssets/pca_priors_full.pt` | 默认全局 PCA 先验文件。<br>EN: Default global PCA-prior file. |
+| `pca_priors_full.pt` | 仓库根目录的全局 PCA 先验文件；需要使用它时显式传入 `--pca-priors-path .\pca_priors_full.pt`。<br>EN: Global PCA-prior file at the repository root; pass `--pca-priors-path .\pca_priors_full.pt` when needed. |
 | `PublicSoilSampleDatabase/` 或下载说明<br>EN: `PublicSoilSampleDatabase/` or download note | 当前公开数据库。<br>EN: Current public database. |
 
 面向使用者的公开包不建议包含：
