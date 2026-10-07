@@ -40,7 +40,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(file).resolve().parent
 
 REQUIRED_FILES = {
     "Train_main.py",
